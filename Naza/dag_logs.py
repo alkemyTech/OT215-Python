@@ -3,12 +3,11 @@ from datetime import datetime
 
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
-
 from log_config import LOG_CFG
 
 logging.config.dictConfig(LOG_CFG)
 logger = logging.getLogger('DAG')
-logger.info('Creando el DAG')
+logger.info(' <- Nombre del Logger')
 
 with DAG("universities_etl",
          description="""
