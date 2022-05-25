@@ -3,9 +3,8 @@ SELECT universidad AS university, carrerra AS career,
        split_part(nombrre,' ', 1) AS first_name,
        split_part(nombrre,' ', 2) AS last_name, 
        sexo AS gender, 
-       age(CURRENT_DATE, to_date(nacimiento, 'DD/MM/YYYY')) AS edad,
+       date_part('year', age(to_date(nacimiento, 'DD/MM/YYYY')))::int as age,
        codgoposstal AS postal_code,
-       direccion AS location,
        eemail AS email
 FROM moron_nacional_pampa
 WHERE universidad='Universidad nacional de la pampa'
