@@ -13,7 +13,6 @@ SELECT
     sexo AS gender,
     date_part('year',age(CURRENT_DATE,date(birth_date))) AS age,
     location,
-    direccion AS postal_code,
     email
 FROM
     jujuy_utn

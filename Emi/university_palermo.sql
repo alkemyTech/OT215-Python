@@ -12,7 +12,6 @@ SELECT
     SPLIT_PART(names, '_', 2) AS last_name,
     sexo AS gender,
     date_part('year',age(CURRENT_DATE,date(birth_dates))) AS age,
-    direcciones AS location,
 	codigo_postal AS postal_code,
     correos_electronicos AS email                                 
 FROM 
