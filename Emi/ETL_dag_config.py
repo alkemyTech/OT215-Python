@@ -31,7 +31,13 @@ def load_data ():
 
 # DAG should be run every 1 hour
 with DAG(
-    dag_id='ETL_university_dag',
+    dag_id='ETL_UNJ_UP_dag',
+    description='''
+                Data extraction with queries db 
+                from UNJ and UP, 
+                data Processing With Pandas,
+                upload data to s3
+                ''',
     schedule_interval = timedelta(hours=1),
     start_date=datetime(year=2022, month=5, day=24),
     catchup=False

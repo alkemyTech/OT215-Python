@@ -34,7 +34,12 @@ def log_university_palermo():
     pass
 
 with DAG(
-    dag_id='logs_university_dag',
+    dag_id='logs_UNJ_UP_dag',
+    description='''
+                logs settings for DAG 
+                and functions log 
+                for UNJ and UP
+                ''',
     schedule_interval = timedelta(hours=1),
     start_date=datetime(year=2022, month=5, day=24),
     catchup=False

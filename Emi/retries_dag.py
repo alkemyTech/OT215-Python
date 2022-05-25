@@ -45,7 +45,12 @@ def connection_postgres():
 
 
 with DAG(
-    dag_id='retries_university_dag',
+    dag_id='retries_UNJ_UP_dag',
+    description='''
+                configuration retries, 
+                and database connection 
+                for UNJ and UP tasks
+                ''',
     default_args=DEFAULT_ARGS,
     schedule_interval = timedelta(hours=1),
     start_date=datetime(year=2022, month=5, day=24),
