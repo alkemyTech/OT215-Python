@@ -1,0 +1,12 @@
+SELECT T1.universities AS university,
+	   T1.careers AS career,
+	   T1.inscription_dates AS inscription_date,
+	   SUBSTRING(T1.names from 1 for (POSITION('-' in T1.names) - 1)) AS first_name,
+	   SUBSTRING(T1.names from (POSITION('-' in T1.names) + 1) for LENGTH(T1.names)) AS last_name,
+	   T1.sexo AS gender,
+	   DATE_PART('year', AGE(CURRENT_DATE, TO_TIMESTAMP(T1.birth_dates, 'DD-MM-YYYY'))) AS age,
+	   SUBSTRING(T1.direccion from 1 for (POSITION('-' in T1.direccion) - 1)) AS postal_code,
+	   T1.locations AS locationn,
+	   T1.emails AS email
+FROM lat_sociales_cine T1
+WHERE T1.universities='-FACULTAD-LATINOAMERICANA-DE-CIENCIAS-SOCIALES';
