@@ -11,6 +11,7 @@ default_args = {
 with DAG(
     'universidadesF_dags.py',
     description='Dag vacio sin consulta ni procesamiento',
+    default_args=default_args,
     schedule_interval=timedelta(hours=1),
     start_date=datetime(2022, 5, 25),
 ) as dag:
