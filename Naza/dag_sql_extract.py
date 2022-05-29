@@ -25,7 +25,7 @@ __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__))
 )
 
-with DAG("universities_etl",
+with DAG("unlpam_uai_etl",
          description="""
          Consultas SQL para las universidades,
          procesamiento de los datos con Pandas,
