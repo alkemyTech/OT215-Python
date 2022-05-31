@@ -7,7 +7,6 @@ from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-
 from log_config import LOG_CFG
 
 logging.config.dictConfig(LOG_CFG)
@@ -17,13 +16,6 @@ default_args = {
     'retries': 5,
     'retry_delay': timedelta(minutes=5)
 }
-
-# Asumiendo que los .sql estan en la misma ubicacion que este archivo,
-# calculo este directorio para evitar errores al levantar el server
-# de Airflow desde otra ubicacion.
-__location__ = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__))
-)
 
 with DAG("unlpam_uai_etl",
          description="""
@@ -44,7 +36,7 @@ with DAG("unlpam_uai_etl",
         pg_hook = PostgresHook(postgres_conn_id="unlpam_uai")
         pg_engine = pg_hook.get_sqlalchemy_engine()
         conn = pg_engine.connect()
-        with open(__location__ + '/' + sql, 'r') as query:
+        with open('scripts/' + sql, 'r') as query:
             df = pd.read_sql_query(query.read(), conn)
             os.makedirs('files', exist_ok=True)
             df.to_csv('files/' + sql.split('.')[0] + '.csv')
