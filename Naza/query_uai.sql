@@ -1,7 +1,6 @@
 SELECT univiersities AS university, carrera AS career,
     inscription_dates AS inscription_date,
-    split_part("names", '-', 1) AS first_name,
-    split_part("names", '-', 2) AS last_name,
+    "names" AS full_name,
     sexo AS gender,
         case 
             when 

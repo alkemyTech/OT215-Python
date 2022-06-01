@@ -7,9 +7,12 @@ def normal_str(s: str):
 
 # lista de columnas a normalizar strings
 uai_to_norm = ['university', 'career',
-               'first_name', 'last_name', 'email', 'location']
+               'full_name', 'email', 'location']
 
-unlpam_to_norm = uai_to_norm[:-1]
+unlpam_to_norm = ['university', 'career',
+                  'first_name', 'last_name', 'email']
+
+words = ['Mr.', 'Dr.', 'Ms.', 'Mrs.', 'dvm', 'dds', 'jr.', 'md']
 
 # df con los codigos postales
 df_pc = pd.read_csv('files/codigos_postales.csv',
@@ -23,7 +26,24 @@ def uai_cleaner():
     df_pc['location'] = df_pc['location'].apply(normal_str)
     df_pc.drop_duplicates(subset='location', keep='first', inplace=True)
 
+    # los nombres con mas de dos palabras los trato aparte
+    mask = df_uai['full_name'].str.split('-').map(len) > 2
+    bad_names = df_uai.loc[mask, 'full_name']
+
+    # quitamos la palabra conflictiva
+    for word in words:
+        bad_names = bad_names.apply(lambda x: x.replace(word, ''))
+
+    # actualizamos el df con los nombres corregidos
+    df_uai.loc[mask, 'full_name'] = bad_names
+
+    # normalizamos los strings
     df_uai[uai_to_norm] = df_uai[uai_to_norm].applymap(normal_str)
+
+    # separamos el nombre en dos partes
+    df_uai['first_name'] = df_uai['full_name'].apply(lambda x: x.split()[0])
+    df_uai['last_name'] = df_uai['full_name'].apply(lambda x: x.split()[1])
+    df_uai.drop('full_name', axis='columns', inplace=True)
 
     # YYYY-MM-DD (%Y-%m-%d) <- formato default cuando se pasa a str
     df_uai['inscription_date'] = pd.to_datetime(
@@ -61,3 +81,4 @@ def unlpam_cleaner():
 def uai_unlpam_cleaner():
     uai_cleaner()
     unlpam_cleaner()
+
