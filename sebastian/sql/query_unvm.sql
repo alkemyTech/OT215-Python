@@ -2,8 +2,7 @@ SELECT
 	universidad AS university, 
 	carrera AS career, 
 	to_date(fecha_de_inscripcion, 'DD-Mon-YY') AS inscription_date, 
-	split_part(nombre,'_',1) AS first_name, 
-	split_part(nombre,'_',2) AS last_name, 
+	nombre AS full_name, 
 	sexo AS gender, 
 	CASE WHEN date_part('year',to_date(fecha_nacimiento,'DD-Mon-YY'))>2022 
 	THEN 100+date_part('year',age(to_date(fecha_nacimiento,'DD-Mon-YY'))) 
