@@ -1,13 +1,13 @@
 import logging
-import os
-import pandas as pd
 from datetime import datetime, timedelta
 
 from airflow import DAG
 from airflow.operators.dummy import DummyOperator
 from airflow.operators.python import PythonOperator
-from airflow.providers.postgres.hooks.postgres import PostgresHook
-from log_config import LOG_CFG
+
+from scripts.db_extraction import data_extract
+from scripts.log_config import LOG_CFG
+from scripts.uai_unlpam_cleaning import uai_unlpam_cleaner
 
 logging.config.dictConfig(LOG_CFG)
 logger = logging.getLogger('DAG')
@@ -27,19 +27,6 @@ with DAG("unlpam_uai_etl",
          schedule_interval='@hourly',
          default_args=default_args
          ) as dag:
-
-    # Dado un .sql y una conexion previamente configurada desde la UI de
-    # Airflow, nos conectamos a la base de datos, se ejecuta la query
-    # y el resultado se guarda en .csv en el directorio files
-    # (Subdirectorio del directorio donde se levanta el server).
-    def data_extract(sql: str):
-        pg_hook = PostgresHook(postgres_conn_id="unlpam_uai")
-        pg_engine = pg_hook.get_sqlalchemy_engine()
-        conn = pg_engine.connect()
-        with open('scripts/' + sql, 'r') as query:
-            df = pd.read_sql_query(query.read(), conn)
-            os.makedirs('files', exist_ok=True)
-            df.to_csv('files/' + sql.split('.')[0] + '.csv')
 
     # Consulta para traer los datos de la primer universidad (UNLPam)
     unlpam_query = PythonOperator(
