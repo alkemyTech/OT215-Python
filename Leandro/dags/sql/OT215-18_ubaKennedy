@@ -1,0 +1,33 @@
+-- Usando una tabla CTE para evitar errores en el formato de los años a veces tomaba años como 2035 por ejemplo 
+-- tomando aquellas personas nacidas entre 1922 y 2022
+WITH fecha AS(
+	SELECT CASE 
+				WHEN
+	   				TO_NUMBER(SUBSTRING(fechas_nacimiento from 1 for (POSITION('-' in fechas_nacimiento) - 1)),'99')<=22
+	   				THEN CONCAT('20',fechas_nacimiento)
+	   			WHEN
+	   				TO_NUMBER(SUBSTRING(fechas_nacimiento from 1 for (POSITION('-' in fechas_nacimiento) - 1)),'99')>22
+	   				THEN CONCAT('19',fechas_nacimiento)
+	   	   END AS nacimiento_def,
+		   id
+	FROM uba_kenedy
+)
+SELECT T1.universidades AS university,
+	   T1.carreras AS career,
+	   T1.fechas_de_inscripcion AS inscription_date,
+	   SUBSTRING(T1.nombres from 1 for (POSITION('-' in T1.nombres) - 1)) AS first_name,
+	   SUBSTRING(T1.nombres from (POSITION('-' in T1.nombres) + 1) for LENGTH(T1.nombres)) AS last_name,
+	   T1.sexo AS gender,
+	   DATE_PART('year', AGE(CURRENT_DATE, TO_TIMESTAMP(fecha.nacimiento_def, 'YYYY Mon DD'))) AS age,
+	   T1.codigos_postales AS postal_code,
+	   T1.direcciones AS locationn, --No puedo usar location porque es palabra reservada
+	   T1.emails AS email
+	--   T1.id  Agregar el id para ver el problemas de las edades (OPCIONAL) 
+FROM uba_kenedy T1
+LEFT JOIN fecha ON T1.id=fecha.id
+WHERE T1.universidades='universidad-j.-f.-kennedy';
+
+--Hay errores (SUPONIENDO VERDADERO QUE NACIERON ENTRE 1922 Y 2022) en las fechas de nacimiento ,
+--por ejemplo la siguiente query 
+--es de una persona que nacio en el 2019 , o en caso alternativo en 1919
+--SELECT * FROM uba_kenedy WHERE id=46
