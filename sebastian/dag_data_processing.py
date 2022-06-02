@@ -37,22 +37,13 @@ with DAG(
 	task_uflo_query = PythonOperator(
 		task_id="uflo_data_extraction",
 		python_callable=data_extraction,
-		op_args={"query_uflo.sql"}
-	)
-	task_unvm_query = PythonOperator(
-		task_id="unvm_data_extraction",
-		python_callable=data_extraction,
-		op_args={"query_unvm.sql"}
+		op_args={"query_uflo.sql","query_unvm.sql"}
 	)
 	task_uflo_processing = PythonOperator(
 		task_id="uflo_data_processing",
 		python_callable=data_processing,
-		op_args={"uflo_data.csv"}
-	)
-	task_unvm_processing = PythonOperator(
-		task_id="unvm_data_processing",
-		python_callable=data_processing,
-		op_args={"unvm_data.csv"}
+		op_args={"uflo_data.csv","unvm_data.csv"}
 	)
 
-	task_uflo_query >> task_unvm_query >> task_uflo_processing >> task_unvm_processing
+
+	task_uflo_query >> task_uflo_processing
