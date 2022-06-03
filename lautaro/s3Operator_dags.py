@@ -7,6 +7,8 @@ import logging
 from scripts.extraccionSQL import sqlUMoron
 from scripts.extraccionSQL import sqlUNRC
 from scripts.funcionPandas import pandasProcesamiento
+from scripts.cargaS3 import s3CargaUMoron
+from scripts.cargaS3 import s3CargaUNRC
 
 
 logger = logging.getLogger('logger')
