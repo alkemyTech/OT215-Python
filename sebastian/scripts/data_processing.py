@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 # University data processing.
 def data_processing(*args):
 	for index, file in enumerate(args):
@@ -8,7 +9,7 @@ def data_processing(*args):
 		# Database union and data normalization.
 		df_external_data = pd.read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTZuCecDicz0IrY7YzSDeQebtTjJ40izeNVS_vW9Kak6kt2BRTTdXC1sqJLdxM7c5amRdRgr5CngZZM/pub?gid=1807168318&single=true&output=csv")
 		df_external_data.columns = ["postal_code","location"]
-		df_external_data= df_external_data.drop_duplicates('postal_code')
+		df_external_data = df_external_data.drop_duplicates('postal_code')
 		df_external_data.reset_index(inplace=True)
 		if "postal_code" in df_university_data.columns:
 			df_university_data = pd.merge(df_university_data, df_external_data, on="postal_code")
@@ -20,14 +21,14 @@ def data_processing(*args):
 
 		# Name separation and data normalization.
 		df_university_data["full_name"] = df_university_data["full_name"].str.lower()
-		corrupted_data = ["dr.", "ms.", "md", "mr.", "mrs.", "dvm", "dds", "miss"]
+		corrupted_data = ["dr.", "ms.", "md", "jr.", "mr.", "mrs.", "dvm", "dds", "miss"]
 		for index, value in enumerate(corrupted_data):
 			df_university_data["full_name"] = df_university_data["full_name"].str.replace(value,"")
 		df_university_data["full_name"] = df_university_data["full_name"].str.replace("_", " ").str.strip()
-		name = df_university_data["full_name"].str.split(" ", n = 1, expand = True) 
+		name = df_university_data["full_name"].str.split(" ", n=1, expand=True) 
 		df_university_data["first_name"] = name[0] 
 		df_university_data["last_name"] = name[1] 
-		df_university_data.drop(columns =["full_name"], inplace = True)
+		df_university_data.drop(columns=["full_name"], inplace=True)
 
 		# Data normalization.
 		df_university_data["university"] = df_university_data["university"].str.lower().str.replace("_", " ").str.strip()
@@ -38,7 +39,7 @@ def data_processing(*args):
 		df_university_data["email"] = df_university_data["email"].str.lower().str.strip()
 
 		# Data reorganization.
-		df_university_data=df_university_data[["university", "career", "inscription_date", "first_name", "last_name", "gender", "age", "postal_code", "location", "email"]]
+		df_university_data = df_university_data[["university", "career", "inscription_date", "first_name", "last_name", "gender", "age", "postal_code", "location", "email"]]
 		
 		# Save text file.
 		name_u = file.strip(".csv").split("_")
