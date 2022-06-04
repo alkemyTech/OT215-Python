@@ -4,11 +4,11 @@ Configurar un Python Operators, para que extraiga información de la base de dat
 utilizando el .sql disponible en el repositorio base.
 """
 
+
 from datetime import timedelta, datetime
 import logging.config
 
 from airflow import DAG
-from airflow.hooks.postgres_hook import PostgresHook
 from airflow.operators.python import PythonOperator
 
 from scripts.data_extraction import data_extraction
@@ -17,11 +17,10 @@ from scripts.data_extraction import data_extraction
 # Logger configuration.
 logging.config.fileConfig(f'airflow/dags/scripts/logging.conf')
 logger = logging.getLogger('DAG')
-logger.info("Starting logs.")
 
-# Retries configuration.
+# Initial setup.
 DEFAULT_ARGS = {
-	"retries": 5,
+	"retries": 5
 }
 
 with DAG(
@@ -36,15 +35,10 @@ with DAG(
 	schedule_interval=timedelta(hours=1)
 ) as dag:
 	# Python-sql operators configuration.
-	task_uflo_query = PythonOperator(
-		task_id="uflo_data_extraction",
+	task_university_query = PythonOperator(
+		task_id="university_data_extraction",
 		python_callable=data_extraction,
-		op_args={"query_uflo.sql"}
-	)
-	task_unvm_query = PythonOperator(
-		task_id="unvm_data_extraction",
-		python_callable=data_extraction,
-		op_args={"query_unvm.sql"}
+		op_args={"query_uflo.sql","query_unvm.sql"}
 	)
 
-	[task_uflo_query, task_unvm_query]
+	task_uflo_query
