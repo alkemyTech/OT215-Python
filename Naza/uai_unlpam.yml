@@ -1,0 +1,52 @@
+dynamic_unlpam_uai:
+
+  default_args:
+    start_date: 2022-05-23
+    retries: 5
+    retry_delay_sec: 300
+  schedule_interval: '0 * * * *'
+  description: 'Consultas SQL para las universidades,
+                procesamiento de los datos con Pandas,
+                cargado de datos en S3.'
+
+  # Se pueden pasar las conn id como parametro para ser mas gral
+  tasks:
+    query_unlpam:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_file: /home/naza/airflow/dags/scripts/db_extraction.py
+      python_callable_name: data_extract
+      op_kwargs:
+        sql: query_unlpam.sql
+
+    query_uai:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_file: /home/naza/airflow/dags/scripts/db_extraction.py
+      python_callable_name: data_extract
+      op_kwargs:
+        sql: query_uai.sql
+
+    uai_unlpam_cleaning:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_file: /home/naza/airflow/dags/scripts/uai_unlpam_cleaning.py
+      python_callable_name: uai_unlpam_cleaner
+      dependencies: [query_unlpam, query_uai]
+
+    uai_to_s3:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_file: /home/naza/airflow/dags/scripts/s3_load.py
+      python_callable_name: file_to_s3
+      op_kwargs:
+        filename: files/uai_clean.txt
+        key: uai_clean
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [uai_unlpam_cleaning]
+
+    unlpam_to_s3:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_file: /home/naza/airflow/dags/scripts/s3_load.py
+      python_callable_name: file_to_s3
+      op_kwargs:
+        filename: files/unlpam_clean.txt
+        key: unlpam_clean
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [uai_unlpam_cleaning]
