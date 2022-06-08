@@ -4,18 +4,13 @@ Configurar un DAG, sin operators y asignar 5 retries.
 """
 
 from datetime import timedelta, datetime
-import logging.config
 
 from airflow import DAG
 
-# Logger configuration.
-logging.config.fileConfig('logging.conf')
-logger = logging.getLogger('DAG')
-logger.info("Starting logs.")
 
-# Retries configuration.
+# Initial setup.
 DEFAULT_ARGS = {
-    "retries": 5,
+	"retries": 5,
 }
 
 with DAG(
