@@ -41,4 +41,4 @@ with DAG(
 		op_args={"query_uflo.sql","query_unvm.sql"}
 	)
 
-	task_uflo_query
+	task_university_query
