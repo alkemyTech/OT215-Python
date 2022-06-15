@@ -1,0 +1,45 @@
+etl_dynamic_dag:
+  default_args:
+    start_date: 2022-05-19
+    retries: 5
+    retry_delay_sec: 300
+  schedule_interval: "0 * * * *"
+  description: "ETL dynamic dag (uflo, unvm)."
+
+  tasks:
+    data_extraction:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: data_extraction
+      python_callable_file: /home/sebasps/airflow/dags/scripts/data_extraction.py
+      op_args: 
+        - query_uflo.sql 
+        - query_unvm.sql
+    
+    data_processing:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: data_processing
+      python_callable_file: /home/sebasps/airflow/dags/scripts/data_processing.py
+      op_args: 
+        - uflo_data.csv
+        - unvm_data.csv
+      dependencies: [data_extraction]
+
+    uflo_data_load_s3:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: connection_to_s3
+      python_callable_file: /home/sebasps/airflow/dags/scripts/data_loaded_s3.py
+      op_kwargs:
+        filename: airflow/dags/files/uflo_normalized.txt
+        key: uflo_normalized.txt
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [data_processing]
+
+    unvm_data_load_s3:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: connection_to_s3
+      python_callable_file: /home/sebasps/airflow/dags/scripts/data_loaded_s3.py
+      op_kwargs:
+        filename: airflow/dags/files/unvm_normalized.txt
+        key: unvm_normalized.txt
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [data_processing]
