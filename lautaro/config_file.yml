@@ -1,0 +1,44 @@
+univF_dynamic_dag:
+  default_args:
+    start_date: 2022-06-07 
+    retries: 5
+    retry_delay_sec: 300
+  schedule_interval: '0 * * * *'
+  description: 'ETL - Universidad de Morón and Universidad Nacional de Río Cuarto'
+ 
+  tasks:
+    extraction_data_UMoron:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: sqlUMoron
+      python_callable_file: /home/lautaror/airflow/dags/scripts/extraccionSQL.py
+      
+    extraction_data_UNRC:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: sqlUNRC
+      python_callable_file: /home/lautaror/airflow/dags/scripts/extraccionSQL.py
+
+    cleaning_data_UnivF:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: cleaningData
+      python_callable_file: /home/lautaror/airflow/dags/scripts/cleanData.py
+      dependencies: [extraction_data_UMoron, extraction_data_UNRC]
+
+    load_S3_UMoron:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: s3CargaUMoron
+      python_callable_file: /home/lautaror/airflow/dags/scripts/cargaS3.py
+      op_kwargs:
+        filename: /home/lautaror/airflow/dags/files/dataUMoron.txt
+        key: dataUMoron.txt
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [cleaning_data_UnivF]
+
+    load_S3_UNRC:
+      operator: airflow.operators.python.PythonOperator
+      python_callable_name: s3CargaUNRC
+      python_callable_file: /home/lautaror/airflow/dags/scripts/cargaS3.py
+      op_kwargs:
+        filename: /home/lautaror/airflow/dags/files/dataUMoron.txt
+        key: dataUMoron.txt
+        bucket_name: cohorte-mayo-2820e45d
+      dependencies: [cleaning_data_UnivF]
