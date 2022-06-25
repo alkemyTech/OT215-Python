@@ -2,18 +2,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter
 from functools import reduce
 from operator import add
-
-tree = ET.parse('posts.xml')
-posts = tree.getroot()
-
-
-# n = cantidad de chunks
-def mk_chunks(posts, n=1):
-    if n < 0:
-        return posts
-
-    return [posts[i: i + len(posts) // n]
-            for i in range(0, len(posts), len(posts) // n)]
+from map_reduce_utils import mk_chunks, get_posts
 
 
 def mapper(posts):
@@ -22,12 +11,20 @@ def mapper(posts):
 
 
 def reducer(count_lst):
+    if not count_lst:
+        return Counter()
+
     return reduce(add, count_lst)
+
+
+def get_top_ten(xml_path):
+    posts = get_posts(xml_path)
+    chunks = mk_chunks(posts, 25)
+    mapped_chunks = list(map(mapper, chunks))  # Mapper toma lista de posts
+    reduced = reducer(mapped_chunks)
+    return reduced.most_common(10)
 
 
 if __name__ == '__main__':
 
-    chunks = mk_chunks(posts, 100)
-    mapped_chunks = list(map(mapper, chunks))
-    reduced = reducer(mapped_chunks)
-    top_ten = reduced.most_common(10)
+    print(get_top_ten('posts.xml'))
