@@ -3,6 +3,8 @@ from functools import reduce
 import time
 import xml.etree.ElementTree as ET
 
+import logging.config
+
 
 def data_chunks(root, n):
 	# Dividing data into groups of n values.
@@ -50,14 +52,28 @@ def average_calculator(dicc):
 	return time.strftime("Days: %d - Time: %H:%M:%S", 
 		time.gmtime(sum(dicc.values())/len(dicc)))
 
+def mapreduce_average_response_time(file):
+	logger = logging.getLogger("average_response_time")
 
-if '__main__' == __name__:
-	tree = ET.parse("posts.xml")
-	# Data division.
-	data_chunk = data_chunks(tree.getroot(), 100)
-	# Main mapping function.
-	mapped = list(map(mapper, data_chunk))
-	# Main reduction function.
-	reduced = reduce(reducer, mapped)
-	# Obtaining the average time.
-	reduced = list(map(average_calculator, [reduced]))
+	try:
+		tree = ET.parse(file)
+	except FileNotFoundError:
+		return logger.error(f"File {file} not found.")
+	else:
+		# Data division.
+		data_chunk = data_chunks(tree.getroot(), 100)
+		logger.info(f"Data of {file} successfully divided.")
+		logger.info(f"Starting mapreduce processing.")
+		# Main mapping function.
+		mapped = list(map(mapper, data_chunk))
+		# Main reduction function.
+		reduced = reduce(reducer, mapped)
+		# Obtaining the average time.
+		reduced = list(map(average_calculator, [reduced]))
+		logger.info(f"Finished processing mapreduce.")
+		# Getting average_response_time.
+		return(reduced)
+
+
+if  __name__ == "__main__":
+	print(mapreduce_average_response_time("posts.xml"))
